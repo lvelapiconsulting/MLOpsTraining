@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split
 def main(args):
     # TO DO: enable autologging
     mlflow.autolog()
-    with mlflow.start_run as run():       
+    with mlflow.start_run():       
 
         # read data
         df = get_csvs_df(args.training_data)
