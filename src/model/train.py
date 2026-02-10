@@ -18,7 +18,7 @@ def main(args):
     print("Training model with the following parameters:")
     # TO DO: enable autologging
     mlflow.autolog()
-    with mlflow.start_run():       
+    with mlflow.start_run():
 
         # read data
         df = get_csvs_df(args.training_data)
@@ -65,7 +65,8 @@ def parse_args():
 
 def split_data(df):
     # split in training and testing data
-    features = ['Pregnancies','PlasmaGlucose','DiastolicBloodPressure','TricepsThickness','SerumInsulin','BMI','DiabetesPedigree','Age']
+    features = ['Pregnancies', 'PlasmaGlucose', 'DiastolicBloodPressure', 'TricepsThickness',
+                 'SerumInsulin', 'BMI', 'DiabetesPedigree', 'Age']
     target = 'Diabetic'
     missed_features = [col for col in features + [target] if col not in df.columns]
     if missed_features:
