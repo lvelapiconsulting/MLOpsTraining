@@ -11,8 +11,6 @@ import mlflow
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
-
-
 # define functions
 def main(args):
     print("Training model with the following parameters:")
@@ -22,10 +20,10 @@ def main(args):
 
         # read data
         df = get_csvs_df(args.training_data)
-    
+
         # split data
         X_train, X_test, y_train, y_test = split_data(df)
-    
+
         # train model
         train_model(args.reg_rate, X_train, X_test, y_train, y_test)
 
@@ -63,19 +61,23 @@ def parse_args():
     # return args
     return args
 
+
 def split_data(df):
     # split in training and testing data
-    features = ['Pregnancies', 'PlasmaGlucose', 'DiastolicBloodPressure', 'TricepsThickness',
-                 'SerumInsulin', 'BMI', 'DiabetesPedigree', 'Age']
+    features = ['Pregnancies', 'PlasmaGlucose',
+                'DiastolicBloodPressure', 'TricepsThickness',
+                'SerumInsulin', 'BMI', 'DiabetesPedigree', 'Age']
     target = 'Diabetic'
-    missed_features = [col for col in features + [target] if col not in df.columns]
+    missed_features = [col for col in features + [target]
+                       if col not in df.columns]
     if missed_features:
-        raise ValueError(f"The dataframe does not contains the features:\n {missed_features}")
+        msg = (f"DF features missed:\n{missed_features}")
+        raise ValueError(msg)
     X, y = df[features].values, df[target].values
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.30, random_state=0
+        )
     return X_train, X_test, y_train, y_test
-
-
 
 # run script
 if __name__ == "__main__":
