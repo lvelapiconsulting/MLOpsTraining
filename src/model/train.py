@@ -94,15 +94,15 @@ def hyperparameter_tuning_RF(X_train, X_test, y_train, y_test):
         estimator=RandomForestClassifier(random_state=0),
         param_distributions=param_dist,
         n_iter=10,
-        cv=5,
+        cv=2,
         random_state=0
-    )  
+    )
     random_search.fit(X_train, y_train)
     best_model = random_search.best_estimator_
     # Evaluate the best model on the test set
     test_score = best_model.score(X_test, y_test)
     print(f"Best Random Forest model test score: {test_score}")
-    print(f"Best Random Forest model hyperparameters: {random_search.best_params_}")
+    print(f"Best RF hyperparameters: {random_search.best_params_}")
 
 
 def split_data(df):

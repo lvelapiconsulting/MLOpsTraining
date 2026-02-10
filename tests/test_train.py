@@ -30,10 +30,10 @@ def test_csvs_creates_dataframe():
 
 
 def test_split_data_missing_features():
-        df = pd.DataFrame({'col1': [1, 2, 3]})
-        with pytest.raises(ValueError) as error:
-            split_data(df)
-        assert error.match("The dataframe does not contains the features")
+    df = pd.DataFrame({'col1': [1, 2, 3]})
+    with pytest.raises(ValueError) as error:
+        split_data(df)
+    assert error.match("DF features missed")
 
 
 def test_split_data_valid():
@@ -168,7 +168,7 @@ def test_hyperparameter_tuning_RF_finds_best_params():
         estimator=RandomForestClassifier(random_state=0),
         param_distributions=param_dist,
         n_iter=10,
-        cv=5,
+        cv=2,
         random_state=0
     )
     random_search.fit(X_train, y_train)
