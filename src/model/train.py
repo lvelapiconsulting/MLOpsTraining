@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 
 # define functions
 def main(args):
+    print("Training model with the following parameters:")
     # TO DO: enable autologging
     mlflow.autolog()
     with mlflow.start_run():       
