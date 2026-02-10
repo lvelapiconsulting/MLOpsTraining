@@ -11,6 +11,7 @@ import mlflow
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
+
 # define functions
 def main(args):
     print("Training model with the following parameters:")
@@ -78,6 +79,7 @@ def split_data(df):
         X, y, test_size=0.30, random_state=0
         )
     return X_train, X_test, y_train, y_test
+
 
 # run script
 if __name__ == "__main__":
