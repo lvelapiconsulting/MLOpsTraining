@@ -71,14 +71,13 @@ def split_data(df):
     missed_features = [col for col in features + [target]
                        if col not in df.columns]
     if missed_features:
-        msg = (f"The dataframe does not contains the features:\n"
-               f" {missed_features}")
+        msg = (f"DF features missed:\n{missed_features}")
         raise ValueError(msg)
     X, y = df[features].values, df[target].values
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.30, random_state=0)
+        X, y, test_size=0.30, random_state=0
+        )
     return X_train, X_test, y_train, y_test
-
 
 # run script
 if __name__ == "__main__":
