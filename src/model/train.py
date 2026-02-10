@@ -9,7 +9,8 @@ import pandas as pd
 import mlflow
 
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 
 
 # define functions
@@ -28,6 +29,12 @@ def main(args):
         # train model
         train_model(args.reg_rate, X_train, X_test, y_train, y_test)
 
+        # train random forest model
+        random_forest_model(X_train, X_test, y_train, y_test)
+
+        # hyperparameter tuning for random forest model
+        hyperparameter_tuning_RF(X_train, X_test, y_train, y_test)
+
 
 def get_csvs_df(path):
     if not os.path.exists(path):
@@ -38,12 +45,13 @@ def get_csvs_df(path):
     return pd.concat((pd.read_csv(f) for f in csv_files), sort=False)
 
 
-# TO DO: add function to split data
-
-
 def train_model(reg_rate, X_train, X_test, y_train, y_test):
     # train model
-    LogisticRegression(C=1/reg_rate, solver="liblinear").fit(X_train, y_train)
+    model = LogisticRegression(C=1/reg_rate, solver="liblinear")
+    model.fit(X_train, y_train)
+    # evaluate the model on the test set
+    test_score = model.score(X_test, y_test)
+    print(f"Logistic Regression model test score: {test_score}")
 
 
 def parse_args():
@@ -61,6 +69,40 @@ def parse_args():
 
     # return args
     return args
+
+
+def random_forest_model(X_train, X_test, y_train, y_test):
+    # train a random forest model
+    model = RandomForestClassifier(n_estimators=10, max_depth=5,
+                                   random_state=0)
+    model.fit(X_train, y_train)
+    # evaluate the model on the test set
+    test_score = model.score(X_test, y_test)
+    print(f"Random Forest model test score: {test_score}")
+
+
+def hyperparameter_tuning_RF(X_train, X_test, y_train, y_test):
+    # Create a random search space for the hyperparameters
+    param_dist = {
+        'n_estimators': [10, 50, 100],
+        'max_depth': [5, 10, None],
+        'min_samples_split': [2, 5, 10],
+        'min_samples_leaf': [1, 2, 4]
+    }
+    # Perform random search with cross-validation
+    random_search = RandomizedSearchCV(
+        estimator=RandomForestClassifier(random_state=0),
+        param_distributions=param_dist,
+        n_iter=10,
+        cv=5,
+        random_state=0
+    )  
+    random_search.fit(X_train, y_train)
+    best_model = random_search.best_estimator_
+    # Evaluate the best model on the test set
+    test_score = best_model.score(X_test, y_test)
+    print(f"Best Random Forest model test score: {test_score}")
+    print(f"Best Random Forest model hyperparameters: {random_search.best_params_}")
 
 
 def split_data(df):
