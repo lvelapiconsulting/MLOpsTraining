@@ -2,7 +2,7 @@ name: Challenge 5
 
 on:
   push:
-    branches: ["main","master"]
+    branches: ["main"]
 
 jobs:
   experiment:
