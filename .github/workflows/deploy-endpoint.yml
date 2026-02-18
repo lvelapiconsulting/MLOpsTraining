@@ -29,10 +29,13 @@ jobs:
         az ml online-endpoint create --file deployment/endpoint.yml 2>/dev/null || \
         az ml online-endpoint update --file deployment/endpoint.yml
     
-    - name: Create or update deployment
+    - name: Delete existing deployment if failed
       run: |
-        az ml online-deployment create --file deployment/deployment.yml --all-traffic 2>/dev/null || \
-        az ml online-deployment update --file deployment/deployment.yml
+        az ml online-deployment delete --name blue --endpoint-name diabetes-endpoint --yes --no-wait || true
+    
+    - name: Create deployment
+      run: |
+        az ml online-deployment create --file deployment/deployment.yml --all-traffic
     
     - name: Get endpoint details
       run: |
