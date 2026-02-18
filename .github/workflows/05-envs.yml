@@ -53,8 +53,9 @@ jobs:
     - name: Run Azure ML job (production)
       id: aml_job
       run: |
-        az ml job create --file src/job.yml --set inputs.training_data.path=azureml:diabetes-prod-folder@latest --stream --query name -o tsv > job_name.txt
-        echo "run_id=$(cat job_name.txt)" >> $GITHUB_OUTPUT
+        run_id=$(az ml job create --file src/job.yml --set inputs.training_data.path=azureml:diabetes-prod-folder@latest --query name -o tsv)
+        echo "run_id=$run_id" >> $GITHUB_OUTPUT
+        az ml job stream --name $run_id
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
