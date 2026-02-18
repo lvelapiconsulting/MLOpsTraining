@@ -26,11 +26,13 @@ jobs:
     
     - name: Create or update endpoint
       run: |
-        az ml online-endpoint create --file deployment/endpoint.yml
+        az ml online-endpoint create --file deployment/endpoint.yml 2>/dev/null || \
+        az ml online-endpoint update --file deployment/endpoint.yml
     
     - name: Create or update deployment
       run: |
-        az ml online-deployment create --file deployment/deployment.yml --all-traffic
+        az ml online-deployment create --file deployment/deployment.yml --all-traffic 2>/dev/null || \
+        az ml online-deployment update --file deployment/deployment.yml
     
     - name: Get endpoint details
       run: |
