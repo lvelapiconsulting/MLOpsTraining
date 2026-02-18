@@ -49,7 +49,25 @@ jobs:
         creds: ${{secrets.AZURE_CREDENTIALS}}
     - name: Set Azure ML defaults
       run: |
-        az configure --defaults group=rg-lvela-training workspace=aml-lvela-training
+        az configure --defaults group=${{ secrets.RESOURCE_GROUP }} workspace=${{ secrets.WORKSPACE_NAME }}
     - name: Run Azure ML job (production)
+      id: aml_job
       run: |
-        az ml job create --file src/job.yml --set inputs.training_data.path=azureml:diabetes-prod-folder@latest --stream
+        az ml job create --file src/job.yml --set inputs.training_data.path=azureml:diabetes-prod-folder@latest --stream --query name -o tsv > job_name.txt
+        echo "run_id=$(cat job_name.txt)" >> $GITHUB_OUTPUT
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install Python dependencies
+      run: |
+        pip install azure-ai-ml azure-identity mlflow
+    - name: Register trained model
+      run: |
+        python Model_registry/model_registry_from_job.py \
+          --subscription_id ${{ secrets.SUBSCRIPTION_ID }} \
+          --resource_group ${{ secrets.RESOURCE_GROUP }} \
+          --workspace_name ${{ secrets.WORKSPACE_NAME }} \
+          --run-id "${{ steps.aml_job.outputs.run_id }}" \
+          --artifact-path "model" \
+          --register-model-name "diabetes-model"

@@ -73,7 +73,7 @@ def parse_args():
 
 def random_forest_model(X_train, X_test, y_train, y_test):
     # train a random forest model
-    model = RandomForestClassifier(n_estimators=10, max_depth=5,
+    model = RandomForestClassifier(n_estimators=3, max_depth=3,
                                    random_state=0)
     model.fit(X_train, y_train)
     # evaluate the model on the test set
@@ -84,16 +84,16 @@ def random_forest_model(X_train, X_test, y_train, y_test):
 def hyperparameter_tuning_RF(X_train, X_test, y_train, y_test):
     # Create a random search space for the hyperparameters
     param_dist = {
-        'n_estimators': [10, 50, 100],
-        'max_depth': [5, 10, None],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4]
+        'n_estimators': [3, 5],
+        'max_depth': [3, 4, None],
+        'min_samples_split': [2, 5],
+        'min_samples_leaf': [1, 2]
     }
     # Perform random search with cross-validation
     random_search = RandomizedSearchCV(
         estimator=RandomForestClassifier(random_state=0),
         param_distributions=param_dist,
-        n_iter=10,
+        n_iter=3,
         cv=2,
         random_state=0
     )
