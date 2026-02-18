@@ -1,0 +1,34 @@
+name: Create Online Endpoint
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-endpoint:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Check out repo
+      uses: actions/checkout@main
+    
+    - name: Install az ml extension
+      run: az extension add -n ml -y
+    
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+    
+    - name: Set Azure ML defaults
+      run: |
+        az configure --defaults group=${{ secrets.RESOURCE_GROUP }} workspace=${{ secrets.WORKSPACE_NAME }}
+    
+    - name: Create or update endpoint
+      run: |
+        az ml online-endpoint create --file deployment/endpoint.yml 2>/dev/null || \
+        az ml online-endpoint update --file deployment/endpoint.yml
+    
+    - name: Get endpoint details
+      run: |
+        az ml online-endpoint show --name diabetes-endpoint

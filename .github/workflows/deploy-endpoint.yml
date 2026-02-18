@@ -1,4 +1,4 @@
-name: Deploy Model Endpoint
+name: Deploy Model to Endpoint
 
 on:
   workflow_dispatch:
@@ -36,11 +36,6 @@ jobs:
         az role assignment create --assignee $WORKSPACE_IDENTITY --role AcrPull --scope $ACR_ID || true
         az role assignment create --assignee $WORKSPACE_IDENTITY --role AcrPush --scope $ACR_ID || true
     
-    - name: Create or update endpoint
-      run: |
-        az ml online-endpoint create --file deployment/endpoint.yml 2>/dev/null || \
-        az ml online-endpoint update --file deployment/endpoint.yml
-    
     - name: Delete existing deployment if failed
       run: |
         az ml online-deployment delete --name blue --endpoint-name diabetes-endpoint --yes || true
@@ -48,6 +43,11 @@ jobs:
     - name: Create deployment
       run: |
         az ml online-deployment create --file deployment/deployment.yml --all-traffic
+    
+    - name: Get deployment logs (if creation failed)
+      if: failure()
+      run: |
+        az ml online-deployment get-logs --name blue --endpoint-name diabetes-endpoint --lines 100 || true
     
     - name: Get endpoint details
       run: |
