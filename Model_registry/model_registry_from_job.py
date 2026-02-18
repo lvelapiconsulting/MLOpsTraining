@@ -1,7 +1,8 @@
 import argparse
-import mlflow
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
+from azure.ai.ml.entities import Model
+from azure.ai.ml.constants import AssetTypes
 
 def main():
     p = argparse.ArgumentParser(description="Register model to Azure ML Model Registry from AML run")
@@ -20,11 +21,24 @@ def main():
         args.workspace_name
     )
 
-    model_uri = f"runs:/{args.run_id}/{args.artifact_path}"
-    print(f"Registering model from URI: {model_uri} to Azure ML Model Registry with name: {args.register_model_name}")
+    # Create model path from job run
+    model_path = f"azureml://jobs/{args.run_id}/outputs/artifacts/paths/{args.artifact_path}/"
+    print(f"Registering model from path: {model_path}")
+    print(f"Model name: {args.register_model_name}")
 
-    result = mlflow.register_model(model_uri,name=args.register_model_name)
-    print(f"Model registered with name: {result.name} and version: {result.version}")
+    # Register the model using Azure ML SDK
+    model = Model(
+        path=model_path,
+        name=args.register_model_name,
+        description=f"Model registered from job {args.run_id}",
+        type=AssetTypes.MLFLOW_MODEL
+    )
+    
+    registered_model = ml_client.models.create_or_update(model)
+    print(f"Model registered successfully!")
+    print(f"  Name: {registered_model.name}")
+    print(f"  Version: {registered_model.version}")
+    print(f"  ID: {registered_model.id}")
 
 if __name__ == "__main__":
     main()
