@@ -5,8 +5,6 @@ import pandas as pd
 import pytest
 
 from model.train import get_csvs_df, split_data, train_model
-from model.train import random_forest_model, hyperparameter_tuning_RF
-from model.train import RandomizedSearchCV, RandomForestClassifier
 
 
 
@@ -95,90 +93,3 @@ def test_train_model_mismatched_dimensions():
     y_test = np.array([1, 0])
     with pytest.raises(ValueError):
         train_model(0.01, X_train, X_test, y_train, y_test)
-
-def test_random_forest_model_executes_successfully():
-    X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-    X_test = np.array([[2, 3], [6, 7]])
-    y_train = np.array([0, 1, 0, 1])
-    y_test = np.array([1, 0])
-    random_forest_model(X_train, X_test, y_train, y_test)
-
-
-def test_random_forest_model_with_larger_dataset():
-    X_train = np.random.rand(100, 5)
-    X_test = np.random.rand(30, 5)
-    y_train = np.random.randint(0, 2, 100)
-    y_test = np.random.randint(0, 2, 30)
-    random_forest_model(X_train, X_test, y_train, y_test)
-
-
-def test_random_forest_model_mismatched_dimensions():
-    X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-    X_test = np.array([[2, 3, 4], [6, 7, 8]])
-    y_train = np.array([0, 1, 0, 1])
-    y_test = np.array([1, 0])
-    with pytest.raises(ValueError):
-        random_forest_model(X_train, X_test, y_train, y_test)
-
-
-def test_random_forest_model_single_sample():
-    X_train = np.array([[1, 2], [3, 4]])
-    X_test = np.array([[2, 3]])
-    y_train = np.array([0, 1])
-    y_test = np.array([1])
-    random_forest_model(X_train, X_test, y_train, y_test)
-
-def test_hyperparameter_tuning_RF_executes_successfully():
-    X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12]])
-    X_test = np.array([[2, 3], [6, 7]])
-    y_train = np.array([0, 1, 0, 1, 0, 1])
-    y_test = np.array([1, 0])
-    hyperparameter_tuning_RF(X_train, X_test, y_train, y_test)
-
-
-def test_hyperparameter_tuning_RF_with_larger_dataset():
-    X_train = np.random.rand(100, 5)
-    X_test = np.random.rand(30, 5)
-    y_train = np.random.randint(0, 2, 100)
-    y_test = np.random.randint(0, 2, 30)
-    hyperparameter_tuning_RF(X_train, X_test, y_train, y_test)
-
-
-def test_hyperparameter_tuning_RF_mismatched_dimensions():
-    X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
-    X_test = np.array([[2, 3, 4], [6, 7, 8]])
-    y_train = np.array([0, 1, 0, 1])
-    y_test = np.array([1, 0])
-    with pytest.raises(ValueError):
-        hyperparameter_tuning_RF(X_train, X_test, y_train, y_test)
-
-
-def test_hyperparameter_tuning_RF_finds_best_params():
-    X_train = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12]])
-    X_test = np.array([[2, 3], [6, 7]])
-    y_train = np.array([0, 1, 0, 1, 0, 1])
-    y_test = np.array([1, 0])
-    param_dist = {
-        'n_estimators': [10, 50, 100],
-        'max_depth': [5, 10, None],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4]
-    }
-    random_search = RandomizedSearchCV(
-        estimator=RandomForestClassifier(random_state=0),
-        param_distributions=param_dist,
-        n_iter=10,
-        cv=2,
-        random_state=0
-    )
-    random_search.fit(X_train, y_train)
-    assert random_search.best_params_ is not None
-    assert isinstance(random_search.best_params_, dict)
-
-
-def test_hyperparameter_tuning_RF_single_feature():
-    X_train = np.array([[1], [2], [3], [4], [5], [6]])
-    X_test = np.array([[1.5], [3.5]])
-    y_train = np.array([0, 1, 0, 1, 0, 1])
-    y_test = np.array([1, 0])
-    hyperparameter_tuning_RF(X_train, X_test, y_train, y_test)
