@@ -128,11 +128,12 @@ def create_deployment(ml_client, endpoint_name, deployment_name, model_name,
         )
         
         # Create deployment configuration
+        # Using same curated environment as training to avoid MLflow auto-build failures
         deployment = ManagedOnlineDeployment(
             name=deployment_name,
             endpoint_name=endpoint_name,
             model=model_name,
-            environment="azureml://registries/azureml/environments/sklearn-1.0/labels/latest",
+            environment="azureml://registries/azureml/environments/AzureML-sklearn-0.24-ubuntu18.04-py37-cpu/labels/latest",
             instance_type=instance_type,
             instance_count=instance_count,
             request_settings=request_settings,
