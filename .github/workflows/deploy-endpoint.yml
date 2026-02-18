@@ -38,6 +38,10 @@ jobs:
         az role assignment create --assignee $WORKSPACE_IDENTITY --role AcrPull --scope $ACR_ID || true
         az role assignment create --assignee $WORKSPACE_IDENTITY --role AcrPush --scope $ACR_ID || true
     
+    - name: Sync workspace keys
+      run: |
+        az ml workspace sync-keys --name ${{ secrets.WORKSPACE_NAME }} --resource-group ${{ secrets.RESOURCE_GROUP }}
+    
     - name: Deploy model using Python SDK
       env:
         SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
@@ -46,7 +50,7 @@ jobs:
         ENDPOINT_NAME: diabetes-endpoint
         DEPLOYMENT_NAME: blue
         MODEL_NAME: diabetes-model@latest
-        INSTANCE_TYPE: Standard_F2s_v2
+        INSTANCE_TYPE: Standard_F4s_v2
         INSTANCE_COUNT: 1
       run: |
         python deployment/deploy_model.py

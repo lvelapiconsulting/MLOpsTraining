@@ -110,30 +110,31 @@ def create_deployment(ml_client, endpoint_name, deployment_name, model_name,
             max_queue_wait_ms=60000
         )
         
-        # Configure health probes
+        # Configure health probes with longer timeouts for MLflow conda installation
+        # See: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-troubleshoot-online-endpoints#error-resourcenotready
         liveness_probe = ProbeSettings(
-            failure_threshold=3,
+            failure_threshold=30,
             success_threshold=1,
             timeout=2,
             period=10,
-            initial_delay=10
+            initial_delay=600
         )
         
         readiness_probe = ProbeSettings(
-            failure_threshold=3,
+            failure_threshold=30,
             success_threshold=1,
             timeout=10,
             period=10,
-            initial_delay=10
+            initial_delay=600
         )
         
         # Create deployment configuration
-        # Using same curated environment as training to avoid MLflow auto-build failures
+        # MLflow no-code deployment: do NOT specify environment or scoring_script
+        # Azure ML auto-generates the serving environment from the MLflow model
         deployment = ManagedOnlineDeployment(
             name=deployment_name,
             endpoint_name=endpoint_name,
             model=model_name,
-            environment="azureml://registries/azureml/environments/AzureML-sklearn-0.24-ubuntu18.04-py37-cpu/labels/latest",
             instance_type=instance_type,
             instance_count=instance_count,
             request_settings=request_settings,
