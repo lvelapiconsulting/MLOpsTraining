@@ -50,7 +50,7 @@ jobs:
         ENDPOINT_NAME: diabetes-endpoint
         DEPLOYMENT_NAME: blue
         MODEL_NAME: diabetes-model@latest
-        INSTANCE_TYPE: Standard_F4s_v2
+        INSTANCE_TYPE: Standard_F2s_v2
         INSTANCE_COUNT: 1
       run: |
         python deployment/deploy_model.py

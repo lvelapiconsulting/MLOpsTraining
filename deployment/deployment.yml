@@ -4,3 +4,4 @@ endpoint_name: diabetes-endpoint
 model: azureml:diabetes-model@latest
 instance_type: Standard_F4s_v2
 instance_count: 1
+STANDARD_E4DS_V4
