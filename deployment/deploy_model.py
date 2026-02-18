@@ -36,8 +36,8 @@ def validate_model_exists(ml_client, model_reference):
         
         # Check if @latest or specific version
         if '@latest' in model_reference or ':latest' in model_reference:
-            # List models to get latest version
-            models = list(ml_client.models.list(name=model_name, latest=True))
+            # List models to get latest version (sorted descending by version)
+            models = list(ml_client.models.list(name=model_name))
             if models:
                 latest = models[0]
                 print(f"✅ Found model: {latest.name} v{latest.version}")
@@ -181,7 +181,7 @@ def main():
     endpoint_name = os.environ.get('ENDPOINT_NAME', 'diabetes-endpoint')
     deployment_name = os.environ.get('DEPLOYMENT_NAME', 'blue')
     model_name = os.environ.get('MODEL_NAME', 'diabetes-model@latest')
-    instance_type = os.environ.get('INSTANCE_TYPE', 'Standard_DS11_v2')
+    instance_type = os.environ.get('INSTANCE_TYPE', 'Standard_DS3_v2')
     instance_count = int(os.environ.get('INSTANCE_COUNT', '1'))
     
     print("=" * 60)
