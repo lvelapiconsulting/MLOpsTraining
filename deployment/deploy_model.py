@@ -120,6 +120,7 @@ def create_deployment(ml_client, endpoint_name, deployment_name, model_name,
             initial_delay=600
         )
         
+        # Test initial delay 600
         readiness_probe = ProbeSettings(
             failure_threshold=30,
             success_threshold=1,
