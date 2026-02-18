@@ -45,7 +45,7 @@ jobs:
         WORKSPACE_NAME: ${{ secrets.WORKSPACE_NAME }}
         ENDPOINT_NAME: diabetes-endpoint
         DEPLOYMENT_NAME: blue
-        MODEL_NAME: azureml:diabetes-model@latest
+        MODEL_NAME: diabetes-model@latest
         INSTANCE_TYPE: Standard_DS11_v2
         INSTANCE_COUNT: 1
       run: |

@@ -26,6 +26,43 @@ def create_ml_client(subscription_id, resource_group, workspace_name):
         print(f"❌ Error connecting to Azure ML: {e}")
         sys.exit(1)
 
+def validate_model_exists(ml_client, model_reference):
+    """Validate that model exists in registry"""
+    try:
+        # Parse model reference
+        model_name = model_reference.replace('@latest', '').replace(':latest', '')
+        
+        print(f"🔍 Validating model: {model_name}")
+        
+        # Check if @latest or specific version
+        if '@latest' in model_reference or ':latest' in model_reference:
+            # List models to get latest version
+            models = list(ml_client.models.list(name=model_name, latest=True))
+            if models:
+                latest = models[0]
+                print(f"✅ Found model: {latest.name} v{latest.version}")
+                return f"{latest.name}:{latest.version}"
+        else:
+            # Specific version
+            if ':' in model_reference:
+                name, version = model_reference.split(':')
+            elif '@' in model_reference:
+                name, version = model_reference.split('@')
+            else:
+                name, version = model_reference, '1'
+            
+            model = ml_client.models.get(name=name, version=version)
+            print(f"✅ Found model: {model.name} v{model.version}")
+            return f"{model.name}:{model.version}"
+        
+        print(f"⚠️ Model not found, using reference as-is: {model_reference}")
+        return model_reference.replace('@', ':')
+        
+    except Exception as e:
+        print(f"⚠️ Could not validate model: {e}")
+        print(f"💡 Proceeding with reference: {model_reference}")
+        return model_reference.replace('@', ':')
+
 def validate_endpoint_exists(ml_client, endpoint_name):
     """Validate that endpoint exists"""
     try:
@@ -143,7 +180,7 @@ def main():
     workspace_name = os.environ.get('WORKSPACE_NAME')
     endpoint_name = os.environ.get('ENDPOINT_NAME', 'diabetes-endpoint')
     deployment_name = os.environ.get('DEPLOYMENT_NAME', 'blue')
-    model_name = os.environ.get('MODEL_NAME', 'azureml:diabetes-model@latest')
+    model_name = os.environ.get('MODEL_NAME', 'diabetes-model@latest')
     instance_type = os.environ.get('INSTANCE_TYPE', 'Standard_DS11_v2')
     instance_count = int(os.environ.get('INSTANCE_COUNT', '1'))
     
@@ -170,12 +207,17 @@ def main():
     # Validate endpoint exists
     validate_endpoint_exists(ml_client, endpoint_name)
     
+    # Validate model exists and get full reference
+    validated_model = validate_model_exists(ml_client, model_name)
+    
+    print(f"\n📦 Using model: {validated_model}")
+    
     # Delete existing deployment if exists
     delete_deployment_if_exists(ml_client, endpoint_name, deployment_name)
     
     # Create new deployment
     success = create_deployment(
-        ml_client, endpoint_name, deployment_name, model_name,
+        ml_client, endpoint_name, deployment_name, validated_model,
         instance_type, instance_count
     )
     
