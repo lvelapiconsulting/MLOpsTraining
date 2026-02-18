@@ -31,7 +31,7 @@ jobs:
     
     - name: Delete existing deployment if failed
       run: |
-        az ml online-deployment delete --name blue --endpoint-name diabetes-endpoint --yes --no-wait || true
+        az ml online-deployment delete --name blue --endpoint-name diabetes-endpoint --yes || true
     
     - name: Create deployment
       run: |
